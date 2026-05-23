@@ -18,6 +18,8 @@ interface SettingsState {
   panelOpen: boolean
   panelTab: 'clicky' | 'chat'
   railHidden: boolean
+  role: 'intern' | 'hr'
+  setRole: (r: 'intern' | 'hr') => void
   setLang: (l: 'RU' | 'UZ' | 'EN') => void
   setDensity: (d: 'compact' | 'regular' | 'comfy') => void
   setAccent: (a: string) => void
@@ -47,6 +49,8 @@ export const useSettingsStore = create<SettingsState>()(
       panelOpen: true,
       panelTab: 'clicky',
       railHidden: false,
+      role: 'intern',
+      setRole: (r) => set({ role: r }),
       setLang: (l) => set({ lang: l }),
       setDensity: (d) => set({ density: d }),
       setAccent: (a) => set({ accent: a }),

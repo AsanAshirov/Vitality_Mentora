@@ -5,6 +5,8 @@ import { useSettingsStore } from './store/settingsStore'
 import { useUserStore } from './store/userStore'
 import Clicky from './components/Clicky'
 import SidePanel from './components/SidePanel'
+import HrApp from './hr/HrApp'
+import RoleSwitcher from './hr/RoleSwitcher'
 
 export default function App() {
   const {
@@ -15,6 +17,7 @@ export default function App() {
     clickyColor,
     tutorialMode,
     silentMode,
+    role,
   } = useSettingsStore()
   const { checkStreak } = useUserStore()
   const [summoned, setSummoned] = useState(false)
@@ -60,18 +63,25 @@ export default function App() {
 
   return (
     <ModalContext.Provider value={modalCtx}>
-      <RouterProvider router={router} />
-      {clickyEnabled && (
-        <Clicky
-          enabled={clickyEnabled}
-          mode={clickyMode}
-          summoned={summoned}
-          setSummoned={setSummoned}
-          autoSummoned={tutorialMode && !silentMode}
-          color={clickyColor}
-        />
+      {role === 'hr' ? (
+        <HrApp />
+      ) : (
+        <>
+          <RouterProvider router={router} />
+          {clickyEnabled && (
+            <Clicky
+              enabled={clickyEnabled}
+              mode={clickyMode}
+              summoned={summoned}
+              setSummoned={setSummoned}
+              autoSummoned={tutorialMode && !silentMode}
+              color={clickyColor}
+            />
+          )}
+          <SidePanel summoned={summoned} setSummoned={setSummoned} />
+        </>
       )}
-      <SidePanel summoned={summoned} setSummoned={setSummoned} />
+      <RoleSwitcher />
     </ModalContext.Provider>
   )
 }

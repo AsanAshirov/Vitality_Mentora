@@ -1,0 +1,59 @@
+// iconsHr.tsx — HR portal icon set, ported from reference/icons-hr.jsx
+import React from 'react'
+import { Icon } from './icons'
+
+interface IhrProps {
+  size?: number
+  className?: string
+  style?: React.CSSProperties
+}
+
+export const Ihr = {
+  Dashboard: (p: IhrProps) => <Icon {...p}><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></Icon>,
+  Team:      (p: IhrProps) => <Icon {...p}><circle cx="9" cy="8" r="3.2"/><path d="M3 19a6 6 0 0 1 12 0"/><circle cx="17" cy="9" r="2.6"/><path d="M15 19a4.5 4.5 0 0 1 6 0"/></Icon>,
+  Chart:     (p: IhrProps) => <Icon {...p}><path d="M3 3v18h18"/><rect x="7" y="11" width="3" height="7" rx="0.5"/><rect x="12" y="7" width="3" height="11" rx="0.5"/><rect x="17" y="14" width="3" height="4" rx="0.5"/></Icon>,
+  Message:   (p: IhrProps) => <Icon {...p}><path d="M21 12a8 8 0 1 1-3-6.2L21 4l-1 4.2A8 8 0 0 1 21 12z"/></Icon>,
+  Group:     (p: IhrProps) => <Icon {...p}><path d="M21 20v-1a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v1"/><circle cx="12" cy="7" r="4"/><circle cx="19" cy="6" r="2.4" stroke="currentColor" fill="none"/><circle cx="5" cy="6" r="2.4" stroke="currentColor" fill="none"/></Icon>,
+  Calendar:  (p: IhrProps) => <Icon {...p}><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18"/><path d="M8 3v4M16 3v4"/></Icon>,
+  Phone:     (p: IhrProps) => <Icon {...p}><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3.1-8.7A2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.3 1.8.6 2.7a2 2 0 0 1-.4 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.5c.9.3 1.8.5 2.7.6a2 2 0 0 1 1.7 2.1z"/></Icon>,
+  Video:     (p: IhrProps) => <Icon {...p}><rect x="2" y="6" width="14" height="12" rx="2"/><path d="M16 10l6-3v10l-6-3z"/></Icon>,
+  PhoneOff:  (p: IhrProps) => <Icon {...p}><path d="M2 2l20 20"/><path d="M10.7 5.1a14 14 0 0 1 8.4 2.8 2 2 0 0 1 .3 2.7l-1.3 1.7"/><path d="M5.7 8.3A14 14 0 0 0 3 14a2 2 0 0 0 .9 1.7L7 18.3a2 2 0 0 0 2.8 0L11 17"/></Icon>,
+  CamOff:    (p: IhrProps) => <Icon {...p}><path d="M2 2l20 20"/><path d="M16 10v-2a2 2 0 0 0-2-2H6.3"/><path d="M14 14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8a2 2 0 0 1 1.4-1.9"/><path d="M22 8l-6 4 6 4V8z"/></Icon>,
+  Mic:       (p: IhrProps) => <Icon {...p}><rect x="9" y="3" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0"/><path d="M12 18v3"/></Icon>,
+  MicOff:    (p: IhrProps) => <Icon {...p}><path d="M2 2l20 20"/><path d="M9 9v2a3 3 0 0 0 5.1 2.1"/><path d="M15 9V6a3 3 0 0 0-5.7-1.3"/><path d="M19 11a7 7 0 0 1-9.3 6.6"/><path d="M12 19v3"/></Icon>,
+  Screen:    (p: IhrProps) => <Icon {...p}><rect x="2" y="4" width="20" height="13" rx="2"/><path d="M8 21h8M12 17v4"/><path d="M12 13V8M8 11l4-4 4 4"/></Icon>,
+  Mute:      (p: IhrProps) => <Icon {...p}><polygon points="11 5 6 9 2 9 2 15 6 15 11 19" fill="currentColor" stroke="none"/><path d="M22 9l-6 6M16 9l6 6"/></Icon>,
+  Volume:    (p: IhrProps) => <Icon {...p}><polygon points="11 5 6 9 2 9 2 15 6 15 11 19" fill="currentColor" stroke="none"/><path d="M15.5 8.5a5 5 0 0 1 0 7M19 5a9 9 0 0 1 0 14"/></Icon>,
+  Hand:      (p: IhrProps) => <Icon {...p}><path d="M7 11V5a2 2 0 1 1 4 0v6"/><path d="M11 11V4a2 2 0 1 1 4 0v7"/><path d="M15 11V6a2 2 0 1 1 4 0v8a7 7 0 0 1-14 0v-1a2 2 0 0 1 4 0"/></Icon>,
+  Smile:     (p: IhrProps) => <Icon {...p}><circle cx="12" cy="12" r="9"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><circle cx="9" cy="10" r="0.5" fill="currentColor"/><circle cx="15" cy="10" r="0.5" fill="currentColor"/></Icon>,
+  Paperclip: (p: IhrProps) => <Icon {...p}><path d="M21.4 11.6L12 21a6 6 0 1 1-8.5-8.5L12.6 3.4a4 4 0 1 1 5.7 5.6L9.2 18.1a2 2 0 1 1-2.8-2.8l8-8"/></Icon>,
+  Send:      (p: IhrProps) => <Icon {...p}><path d="M4 20l17-8-17-8 3 8-3 8z"/></Icon>,
+  Plus:      (p: IhrProps) => <Icon {...p}><path d="M12 5v14M5 12h14"/></Icon>,
+  Search:    (p: IhrProps) => <Icon {...p}><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></Icon>,
+  Bell:      (p: IhrProps) => <Icon {...p}><path d="M6 10a6 6 0 1 1 12 0c0 7 3 8 3 8H3s3-1 3-8z"/><path d="M10 21a2 2 0 0 0 4 0"/></Icon>,
+  More:      (p: IhrProps) => <Icon {...p}><circle cx="5" cy="12" r="1.2" fill="currentColor"/><circle cx="12" cy="12" r="1.2" fill="currentColor"/><circle cx="19" cy="12" r="1.2" fill="currentColor"/></Icon>,
+  Filter:    (p: IhrProps) => <Icon {...p}><path d="M3 4h18l-7 9v6l-4-2v-4z"/></Icon>,
+  Download:  (p: IhrProps) => <Icon {...p}><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></Icon>,
+  Arrow:     (p: IhrProps) => <Icon {...p}><path d="M5 12h14M13 6l6 6-6 6"/></Icon>,
+  ArrowL:    (p: IhrProps) => <Icon {...p}><path d="M19 12H5M11 6l-6 6 6 6"/></Icon>,
+  ArrowUp:   (p: IhrProps) => <Icon {...p}><path d="M12 19V5M6 11l6-6 6 6"/></Icon>,
+  ArrowDn:   (p: IhrProps) => <Icon {...p}><path d="M12 5v14M6 13l6 6 6-6"/></Icon>,
+  Check:     (p: IhrProps) => <Icon {...p}><path d="M4 12l5 5 11-11"/></Icon>,
+  X:         (p: IhrProps) => <Icon {...p}><path d="M6 6l12 12M18 6L6 18"/></Icon>,
+  Award:     (p: IhrProps) => <Icon {...p}><circle cx="12" cy="9" r="6"/><path d="M8.5 14l-2 7 5.5-3 5.5 3-2-7"/></Icon>,
+  Target:    (p: IhrProps) => <Icon {...p}><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/></Icon>,
+  Trend:     (p: IhrProps) => <Icon {...p}><path d="M3 17l6-6 4 4 8-8"/><path d="M14 7h7v7"/></Icon>,
+  Flag:      (p: IhrProps) => <Icon {...p}><path d="M4 22V4M4 4h13l-2 4 2 4H4"/></Icon>,
+  Doc:       (p: IhrProps) => <Icon {...p}><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9l-6-6z"/><path d="M14 3v6h6"/></Icon>,
+  Pin:       (p: IhrProps) => <Icon {...p}><path d="M12 17v5M9 4h6l-1 4 3 3-8 3-1-3 3-3z"/></Icon>,
+  Lightning: (p: IhrProps) => <Icon {...p}><path d="M13 2L4 14h7l-1 8 9-12h-7l1-8z"/></Icon>,
+  Heart:     (p: IhrProps) => <Icon {...p}><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.6z"/></Icon>,
+  Activity:  (p: IhrProps) => <Icon {...p}><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></Icon>,
+  ChevronR:  (p: IhrProps) => <Icon {...p}><path d="M9 6l6 6-6 6"/></Icon>,
+  ChevronD:  (p: IhrProps) => <Icon {...p}><path d="M6 9l6 6 6-6"/></Icon>,
+  Settings:  (p: IhrProps) => <Icon {...p}><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1A1.7 1.7 0 0 0 4.7 9a1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H9A1.7 1.7 0 0 0 10 3.1V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9V9c.3.6.9 1 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></Icon>,
+  Swap:      (p: IhrProps) => <Icon {...p}><path d="M7 7h13l-3-3M17 17H4l3 3"/></Icon>,
+  Clock:     (p: IhrProps) => <Icon {...p}><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></Icon>,
+  Brain:     (p: IhrProps) => <Icon {...p}><path d="M9 4a3 3 0 0 1 3 3v10a3 3 0 0 1-6 0v-1a3 3 0 0 1 0-6V8a3 3 0 0 1 3-4z"/><path d="M15 4a3 3 0 0 0-3 3v10a3 3 0 0 0 6 0v-1a3 3 0 0 0 0-6V8a3 3 0 0 0-3-4z"/></Icon>,
+  User:      (p: IhrProps) => <Icon {...p}><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></Icon>,
+}
