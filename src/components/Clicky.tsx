@@ -186,8 +186,8 @@ function Clicky({
           const stop = startListening(
             lang,
             (text) => {
-              // Show transcribed text in a new message bubble
-              console.log('Clicky STT:', text)
+              // Dispatch custom event so AiAssistant can pick it up
+              window.dispatchEvent(new CustomEvent('clicky-ptt-result', { detail: text }))
             },
             () => { setListening(false) },
           )
