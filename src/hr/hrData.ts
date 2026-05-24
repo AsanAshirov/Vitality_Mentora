@@ -146,6 +146,58 @@ const THREAD_D1: ThreadMsg[] = [
   { kind: "msg", from: 1, text: "Понял, спасибо! Готов к разбору в 11:30 👍", time: "11:02" },
 ]
 
+const THREAD_D3: ThreadMsg[] = [
+  { kind: "divider", text: "Сегодня · 10:15" },
+  { kind: "msg", from: 7, text: "Ольга, привет. Мне сказали, пересдача «Возражения» назначена на пятницу?", time: "10:15" },
+  { kind: "msg", from: 0, text: "Да, Григорий. Пятница 14:00. Акцент на фразу-мост из урока 3 модуля «Эмпатия 2.0».", time: "10:18" },
+  { kind: "msg", from: 7, text: "Понял. Можно ещё раз посмотреть запись провала?", time: "10:20" },
+  { kind: "call", direction: "missed", kind2: "voice", duration: "0:42", time: "10:25" },
+  { kind: "msg", from: 0, text: "Вижу, что не взял трубку — ок, пришлю ссылку на запись в чат.", time: "10:28" },
+]
+
+const THREAD_D4: ThreadMsg[] = [
+  { kind: "divider", text: "Сегодня · 09:45" },
+  { kind: "msg", from: 4, text: "Ольга, большое спасибо за подробный фидбэк! Попробую сегодня.", time: "09:45" },
+  { kind: "msg", from: 0, text: "Молодец, Елизавета! Обрати внимание на скорость закрытия звонка — сейчас у тебя чуть выше нормы.", time: "09:48" },
+  { kind: "scenario", title: "«Корп. кредитование · Базовый»", progress: 76, status: "Завершён" },
+  { kind: "msg", from: 4, text: "Вот результат — стало лучше чем вчера?", time: "09:52" },
+]
+
+const THREAD_D2: ThreadMsg[] = [
+  { kind: "divider", text: "Сегодня · 09:20" },
+  { kind: "msg", from: 0, text: "Виктория, отличная работа на сценарии 17 — 95 баллов! 👏", time: "09:20" },
+  { kind: "msg", from: 10, text: "Спасибо, Ольга! Старалась. Когда откроется следующий модуль?", time: "09:25" },
+  { kind: "msg", from: 0, text: "Следующий модуль откроется в среду. Ты в топ-3 по когорте!", time: "09:30" },
+]
+
+const THREAD_D5: ThreadMsg[] = [
+  { kind: "divider", text: "Вчера · 16:45" },
+  { kind: "call", direction: "missed", kind2: "video", duration: "пропущен", time: "16:45" },
+  { kind: "msg", from: 0, text: "Кирилл, перезвони когда сможешь — важный разговор по дедлайну модуля.", time: "17:00" },
+]
+
+const THREAD_D6: ThreadMsg[] = [
+  { kind: "divider", text: "Вчера · 14:30" },
+  { kind: "msg", from: 0, text: "Дмитрий, жду отчёт по сценарию «Холодный звонок». Пришли до конца дня.", time: "14:30" },
+  { kind: "msg", from: 3, text: "Принято, сдам к 18:00.", time: "14:42" },
+]
+
+const THREAD_D7: ThreadMsg[] = [
+  { kind: "divider", text: "Понедельник · 15:45" },
+  { kind: "msg", from: 0, text: "Анастасия, встреча в понедельник в 16:00 — подтверди, пожалуйста.", time: "15:45" },
+  { kind: "msg", from: 12, text: "Согласна, прийду в 16:00", time: "15:52" },
+]
+
+const THREADS: Record<string, ThreadMsg[]> = {
+  d1: THREAD_D1,
+  d2: THREAD_D2,
+  d3: THREAD_D3,
+  d4: THREAD_D4,
+  d5: THREAD_D5,
+  d6: THREAD_D6,
+  d7: THREAD_D7,
+}
+
 const SHARED_FILES: SharedFile[] = [
   { name: "Холодный_звонок_Gold.mp4", size: "12.4 МБ", kind: "MP4" },
   { name: "Отчёт_недели_07.pdf",      size: "1.2 МБ",  kind: "PDF" },
@@ -193,6 +245,7 @@ const hrData: HrData = {
   HR_USER, EMPLOYEES, COHORTS, FEED, SCHEDULE,
   PERF_KPIS, MODULES, HEATMAP, GROUPS, DIRECT,
   THREAD_D1, SHARED_FILES, REQUESTS, REWARDS, CALENDAR_EVENTS,
+  THREADS,
   avClassFromId, initials,
 }
 

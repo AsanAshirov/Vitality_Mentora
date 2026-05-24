@@ -146,6 +146,7 @@ export interface HrData {
   REQUESTS: RequestItem[]
   REWARDS: RewardItem[]
   CALENDAR_EVENTS: CalendarEvent[]
+  THREADS: Record<string, ThreadMsg[]>
   avClassFromId: (id: number) => AvClass
   initials: (name: string) => string
 }

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import './hr.css'
 import { useSettingsStore } from '../store/settingsStore'
 import hrData from './hrData'
@@ -48,9 +48,34 @@ function PlaceholderScreen({ label }: { label: string }) {
 export default function HrApp() {
   const { accent } = useSettingsStore()
   const [route, setRoute] = useState('dashboard')
+
+  // Sidebar drag-to-resize
+  const [sidebarWidth, setSidebarWidth] = useState(220)
+  const [sidebarDragging, setSidebarDragging] = useState(false)
+  const sidebarDragRef = useRef<{ startX: number; startW: number } | null>(null)
+
+  function onSidebarResizeStart(e: React.MouseEvent) {
+    e.preventDefault()
+    sidebarDragRef.current = { startX: e.clientX, startW: sidebarWidth }
+    setSidebarDragging(true)
+    function onMove(ev: MouseEvent) {
+      if (!sidebarDragRef.current) return
+      const dx = ev.clientX - sidebarDragRef.current.startX
+      setSidebarWidth(Math.max(160, Math.min(320, sidebarDragRef.current.startW + dx)))
+    }
+    function onUp() {
+      sidebarDragRef.current = null
+      setSidebarDragging(false)
+      window.removeEventListener('mousemove', onMove)
+      window.removeEventListener('mouseup', onUp)
+    }
+    window.addEventListener('mousemove', onMove)
+    window.addEventListener('mouseup', onUp)
+  }
   const [profileId, setProfileId] = useState<number | null>(null)
   const [callPeer, setCallPeer] = useState<CallPeer | null>(null)
   const [chatOpenId, setChatOpenId] = useState<string | null>(null)
+  const [readConvIds, setReadConvIds] = useState<Set<string>>(new Set<string>())
 
   useEffect(() => {
     const v = COBALT_MAP[accent] || COBALT_MAP['#2046FF']
@@ -63,7 +88,7 @@ export default function HrApp() {
     r.setProperty('--cobalt-glow', v[5])
   }, [accent])
 
-  const unreadDM = hrData.DIRECT.reduce((s, c) => s + c.unread, 0)
+  const unreadDM = hrData.DIRECT.reduce((s, c) => s + (readConvIds.has(c.id) ? 0 : c.unread), 0)
   const unreadGroups = hrData.GROUPS.reduce((s, g) => s + g.unread, 0)
 
   function openProfile(id: number) { setProfileId(id); setRoute('profile') }
@@ -77,6 +102,9 @@ export default function HrApp() {
   function endCall() {
     hrToast('Звонок завершён', { kind: 'good', sub: 'Запись сохранена в карточку участника' })
     setCallPeer(null)
+  }
+  function markConvRead(id: string) {
+    setReadConvIds(prev => new Set([...prev, id]))
   }
 
   const crumbsMap: Record<string, string[]> = {
@@ -99,21 +127,31 @@ export default function HrApp() {
   else if (route === 'employees') screen = <HrEmployees openProfile={openProfile} openChat={openChat} openCall={openCall} />
   else if (route === 'profile')   screen = profileId ? <HrProfile id={profileId} onBack={backFromProfile} openChat={openChat} openCall={openCall} /> : null
   else if (route === 'performance') screen = <HrPerformance openProfile={openProfile} />
-  else if (route === 'messages')  screen = <HrMessages openCall={openCall} initialConvId={chatOpenId} openProfile={openProfile} />
+  else if (route === 'messages')  screen = <HrMessages openCall={openCall} initialConvId={chatOpenId} openProfile={openProfile} onMarkRead={markConvRead} />
   else if (route === 'groups')    screen = <HrGroups openCall={openCall} openProfile={openProfile} />
   else if (route === 'calendar')  screen = <HrCalendar openCall={openCall} openProfile={openProfile} />
   else if (route === 'requests')  screen = <HrRequests />
   else if (route === 'rewards')   screen = <HrRewards openProfile={openProfile} />
-  else if (route === 'settings')  screen = <HrSettings />
+  else if (route === 'settings')  screen = <HrSettings openProfile={openProfile} />
   else screen = <PlaceholderScreen label={crumbsMap[route]?.[1] || route} />
 
   return (
-    <div className="app app-hr">
+    <div
+      className="app app-hr"
+      style={{
+        gridTemplateColumns: `${sidebarWidth}px 4px 1fr`,
+        userSelect: sidebarDragging ? 'none' : undefined,
+      }}
+    >
       <HrSidebar
         route={route}
         setRoute={(r) => { setRoute(r); if (r !== 'profile') setProfileId(null) }}
         unreadDM={unreadDM}
         unreadGroups={unreadGroups}
+      />
+      <div
+        className={"resize-handle" + (sidebarDragging ? ' dragging' : '')}
+        onMouseDown={onSidebarResizeStart}
       />
       <div className={'app-main' + (fullbleed ? ' fullbleed' : '')}>
         <HrTopbar
@@ -121,7 +159,9 @@ export default function HrApp() {
           onOpenProfile={(id) => { if (id) openProfile(id) }}
           onOpenSettings={() => setRoute('settings')}
         />
-        {screen}
+        <React.Fragment key={route}>
+          {screen}
+        </React.Fragment>
       </div>
 
       {callPeer ? (

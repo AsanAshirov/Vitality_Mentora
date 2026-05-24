@@ -16,6 +16,7 @@ export default function HrTopbar({ crumbs, onOpenProfile, onOpenSettings }: HrTo
   const [bellOpen, setBellOpen] = useState(false)
   const [userOpen, setUserOpen] = useState(false)
   const [q, setQ] = useState("")
+  const [notifSeen, setNotifSeen] = useState(false)
 
   function onSearchKey(e: React.KeyboardEvent<HTMLInputElement>) {
     if (e.key === "Enter" && q.trim()) {
@@ -49,9 +50,9 @@ export default function HrTopbar({ crumbs, onOpenProfile, onOpenSettings }: HrTo
       </div>
 
       <div className="top-right">
-        <button className="top-icon" title="Уведомления" ref={bellRef} onClick={() => setBellOpen(o => !o)}>
+        <button className="top-icon" title="Уведомления" ref={bellRef} onClick={() => { setBellOpen(o => !o); setNotifSeen(true) }}>
           <Ihr.Bell size={16} />
-          <span className="dot" />
+          {!notifSeen && <span className="dot" />}
         </button>
         <button
           className="top-icon"

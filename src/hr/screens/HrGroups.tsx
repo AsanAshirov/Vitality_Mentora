@@ -85,6 +85,7 @@ interface GroupListProps {
 }
 
 function GroupList({ activeId, setActiveId, q, setQ, showNewGroup, setShowNewGroup }: GroupListProps) {
+  const [newGroupName, setNewGroupName] = useState('')
   const filtered = hrData.GROUPS.filter(g => g.name.toLowerCase().includes(q.toLowerCase()))
   return (
     <div className="conv-list">
@@ -104,22 +105,28 @@ function GroupList({ activeId, setActiveId, q, setQ, showNewGroup, setShowNewGro
         </div>
       </div>
       {showNewGroup && (
-        <div style={{ padding: '12px 16px', borderBottom: '1px solid var(--line-2)', background: 'var(--surface)' }}>
+        <div style={{ padding: '12px 16px', borderBottom: '1px solid var(--line)', background: 'var(--surface)' }}>
           <input
+            value={newGroupName}
+            onChange={e => setNewGroupName(e.target.value)}
             placeholder="Название группы"
-            style={{ width: '100%', height: 32, padding: '0 10px', border: '1px solid var(--line-2)', borderRadius: 'var(--r-sm)', background: 'var(--paper)', fontSize: 12, marginBottom: 8 }}
+            style={{ width: '100%', height: 32, padding: '0 10px', border: '1px solid var(--line-2)', borderRadius: 'var(--r-sm)', background: 'var(--paper)', fontSize: 13, marginBottom: 8, boxSizing: 'border-box' }}
           />
           <div style={{ display: 'flex', gap: 8 }}>
             <button
               className="btn primary"
-              style={{ height: 28, fontSize: 11 }}
-              onClick={() => { hrToast('Группа создана', { kind: 'good' }); setShowNewGroup(() => false) }}
+              style={{ height: 28, fontSize: 12 }}
+              onClick={() => {
+                if (!newGroupName.trim()) return
+                hrToast('Группа создана', { kind: 'good', sub: newGroupName })
+                setNewGroupName(''); setShowNewGroup(() => false)
+              }}
             >
               Создать
             </button>
             <button
               className="btn ghost"
-              style={{ height: 28, fontSize: 11 }}
+              style={{ height: 28, fontSize: 12 }}
               onClick={() => setShowNewGroup(() => false)}
             >
               Отмена
@@ -172,7 +179,7 @@ interface GroupChatBarProps {
   openCall: (id: number | string, mode: string) => void
   pinned: boolean
   setPinned: (fn: (v: boolean) => boolean) => void
-  moreRef: React.RefObject<HTMLButtonElement>
+  moreRef: React.RefObject<HTMLButtonElement | null>
   moreOpen: boolean
   setMoreOpen: (fn: (v: boolean) => boolean) => void
   setShowGroupSettings: (fn: (v: boolean) => boolean) => void
@@ -311,6 +318,37 @@ function GroupThreadItem({ m, group }: GroupThreadItemProps) {
 }
 
 // ---------------------------------------------------------------------------
+// GroupSettingsForm — module-internal (owns groupNameEdit state)
+// ---------------------------------------------------------------------------
+
+interface GroupSettingsFormProps {
+  group: Group
+  setShowGroupSettings: (fn: (v: boolean) => boolean) => void
+}
+
+function GroupSettingsForm({ group, setShowGroupSettings }: GroupSettingsFormProps) {
+  const [groupNameEdit, setGroupNameEdit] = useState('')
+  return (
+    <div style={{ marginTop: 8, padding: '12px', background: 'var(--surface)', border: '1px solid var(--line-2)', borderRadius: 'var(--r-sm)' }}>
+      <label style={{ fontSize: 11, color: 'var(--mute)', display: 'block', marginBottom: 4 }}>Название группы</label>
+      <input
+        value={groupNameEdit}
+        onChange={e => setGroupNameEdit(e.target.value)}
+        placeholder={group?.name ?? ''}
+        style={{ width: '100%', height: 30, padding: '0 8px', border: '1px solid var(--line-2)', borderRadius: 'var(--r-sm)', background: 'var(--paper)', fontSize: 12, boxSizing: 'border-box', marginBottom: 8 }}
+      />
+      <button
+        className="btn primary"
+        style={{ height: 28, fontSize: 11, width: '100%' }}
+        onClick={() => { hrToast('Настройки сохранены', { kind: 'good' }); setShowGroupSettings(() => false) }}
+      >
+        Сохранить
+      </button>
+    </div>
+  )
+}
+
+// ---------------------------------------------------------------------------
 // GroupRail — module-internal
 // ---------------------------------------------------------------------------
 
@@ -384,20 +422,7 @@ function GroupRail({ group, openCall, openProfile, showAddMember, setShowAddMemb
         )}
 
         {showGroupSettings && (
-          <div style={{ padding: '10px 0', borderTop: '1px solid var(--line-2)' }}>
-            <label style={{ fontSize: 11, color: 'var(--mute)', display: 'block', marginBottom: 4 }}>Название группы</label>
-            <input
-              defaultValue={group?.name}
-              style={{ width: '100%', height: 30, padding: '0 8px', border: '1px solid var(--line-2)', borderRadius: 'var(--r-sm)', background: 'var(--paper)', fontSize: 12 }}
-            />
-            <button
-              className="btn primary"
-              style={{ width: '100%', height: 28, fontSize: 11, marginTop: 8 }}
-              onClick={() => { hrToast('Настройки сохранены', { kind: 'good' }); setShowGroupSettings(() => false) }}
-            >
-              Сохранить
-            </button>
-          </div>
+          <GroupSettingsForm group={group} setShowGroupSettings={setShowGroupSettings} />
         )}
       </div>
 
@@ -480,6 +505,36 @@ export default function HrGroups({ openCall, openProfile }: HrGroupsProps) {
   const [thread, setThread] = useState<ThreadMsg[]>(() => buildGroupThread('g1'))
   const scrollRef = useRef<HTMLDivElement>(null)
 
+  // Drag-to-resize state
+  const [convWidth, setConvWidth] = useState(320)
+  const [railWidth, setRailWidth] = useState(280)
+  const [dragging, setDragging] = useState<'conv' | 'rail' | null>(null)
+  const dragRef = useRef<{ which: 'conv' | 'rail'; startX: number; startW: number } | null>(null)
+
+  function onResizeStart(which: 'conv' | 'rail', e: React.MouseEvent) {
+    e.preventDefault()
+    const startW = which === 'conv' ? convWidth : railWidth
+    dragRef.current = { which, startX: e.clientX, startW }
+    setDragging(which)
+    function onMove(ev: MouseEvent) {
+      if (!dragRef.current) return
+      const dx = ev.clientX - dragRef.current.startX
+      if (dragRef.current.which === 'conv') {
+        setConvWidth(Math.max(220, Math.min(460, dragRef.current.startW + dx)))
+      } else {
+        setRailWidth(Math.max(200, Math.min(400, dragRef.current.startW - dx)))
+      }
+    }
+    function onUp() {
+      dragRef.current = null
+      setDragging(null)
+      window.removeEventListener('mousemove', onMove)
+      window.removeEventListener('mouseup', onUp)
+    }
+    window.addEventListener('mousemove', onMove)
+    window.addEventListener('mouseup', onUp)
+  }
+
   // GroupList state
   const [q, setQ] = useState('')
   const [showNewGroup, setShowNewGroup] = useState(false)
@@ -522,8 +577,15 @@ export default function HrGroups({ openCall, openProfile }: HrGroupsProps) {
     }, 1300)
   }
 
+  const cols = active
+    ? `${convWidth}px 4px 1fr 4px ${railWidth}px`
+    : `${convWidth}px 4px 1fr`
+
   return (
-    <div className="msg-shell">
+    <div
+      className="msg-shell"
+      style={{ gridTemplateColumns: cols, userSelect: dragging ? 'none' : undefined }}
+    >
       <GroupList
         activeId={activeId}
         setActiveId={setActiveId}
@@ -531,6 +593,11 @@ export default function HrGroups({ openCall, openProfile }: HrGroupsProps) {
         setQ={setQ}
         showNewGroup={showNewGroup}
         setShowNewGroup={setShowNewGroup}
+      />
+
+      <div
+        className={"resize-handle" + (dragging === 'conv' ? ' dragging' : '')}
+        onMouseDown={e => onResizeStart('conv', e)}
       />
 
       {active ? (
@@ -569,7 +636,7 @@ export default function HrGroups({ openCall, openProfile }: HrGroupsProps) {
               onChange={e => setDraft(e.target.value)}
               onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send() } }}
             />
-            <button className="icon-btn" onClick={() => hrToast('😊 +1', { kind: 'good' })}>
+            <button className="icon-btn" onClick={() => setDraft(d => d + ['😊','👍','🎉','✅','💡'][Math.floor(Math.random()*5)])}>
               <Ihr.Smile size={16} />
             </button>
             <button className="send-btn" onClick={send} disabled={!draft.trim()}>
@@ -580,15 +647,21 @@ export default function HrGroups({ openCall, openProfile }: HrGroupsProps) {
       ) : null}
 
       {active ? (
-        <GroupRail
-          group={active}
-          openCall={openCall}
-          openProfile={openProfile}
-          showAddMember={showAddMember}
-          setShowAddMember={setShowAddMember}
-          showGroupSettings={showGroupSettings}
-          setShowGroupSettings={setShowGroupSettings}
-        />
+        <>
+          <div
+            className={"resize-handle" + (dragging === 'rail' ? ' dragging' : '')}
+            onMouseDown={e => onResizeStart('rail', e)}
+          />
+          <GroupRail
+            group={active}
+            openCall={openCall}
+            openProfile={openProfile}
+            showAddMember={showAddMember}
+            setShowAddMember={setShowAddMember}
+            showGroupSettings={showGroupSettings}
+            setShowGroupSettings={setShowGroupSettings}
+          />
+        </>
       ) : null}
     </div>
   )

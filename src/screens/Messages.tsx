@@ -683,8 +683,19 @@ export function MessagesPage() {
             <div className="msg-input-side">
               <button className="msg-att" onClick={() => { setEmojiMenu(v => !v); setAttachMenu(false) }}>😊</button>
               {emojiMenu && (
-                <div className="emoji-menu" onMouseLeave={() => setEmojiMenu(false)}>
-                  {'👍🙏✨🎯🔥💎✅❌⚠️📎💬🎉☕💡🛡️🌐'.split('').map(e => (
+                <div className="emoji-menu emoji-menu-large" onMouseLeave={() => setEmojiMenu(false)}>
+                  {[
+                    // Реакции
+                    '👍','👎','❤️','🔥','😂','😭','🙏','✨','🎉','💯',
+                    // Работа / банк
+                    '✅','❌','⚠️','🛡️','🔐','💰','💳','🏦','📋','📎',
+                    // Общение
+                    '💬','📞','📧','🤝','👋','💡','🎯','⏰','📅','🌐',
+                    // Эмоции
+                    '😊','😎','🤔','😅','🥳','😤','🫡','🤩','😇','🙌',
+                    // Разное
+                    '☕','🚀','💎','⭐','🏆','📊','💼','🔍','📌','✍️',
+                  ].map(e => (
                     <button key={e} onClick={() => handleEmoji(e)}>{e}</button>
                   ))}
                 </div>

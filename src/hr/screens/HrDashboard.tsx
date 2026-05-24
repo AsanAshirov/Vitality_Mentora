@@ -142,8 +142,8 @@ export default function HrDashboard({ setRoute, openProfile, openChat }: HrDashb
         </div>
       </div>
 
-      {showAddIntern && (
-        <div style={{background:'var(--surface)', border:'1px solid var(--line-2)', borderRadius:'var(--r-lg)', padding:'18px 20px', marginBottom:16, display:'grid', gridTemplateColumns:'1fr 1fr 1fr auto', gap:10, alignItems:'end'}}>
+      <div className={'inline-panel' + (showAddIntern ? ' open' : '')} style={{marginBottom: showAddIntern ? 16 : 0}}>
+        <div style={{background:'var(--surface)', border:'1px solid var(--line-2)', borderRadius:'var(--r-lg)', padding:'18px 20px', display:'grid', gridTemplateColumns:'1fr 1fr 1fr auto', gap:10, alignItems:'end'}}>
           <div>
             <label style={{fontSize:11,color:'var(--mute)',display:'block',marginBottom:4}}>Имя</label>
             <input style={{width:'100%',height:34,padding:'0 10px',border:'1px solid var(--line-2)',borderRadius:'var(--r-sm)',background:'var(--paper)',fontSize:13}} placeholder="Фамилия Имя"/>
@@ -163,17 +163,17 @@ export default function HrDashboard({ setRoute, openProfile, openChat }: HrDashb
             <button className="btn ghost" style={{height:34}} onClick={() => setShowAddIntern(false)}>Отмена</button>
           </div>
         </div>
-      )}
+      </div>
 
       <div className="hr-hero">
         <div className="hr-headline">
           <div className="eyebrow">Обзор недели</div>
           <h2>Когорта <em>Корпоратив</em> закрывает модуль «Антифрод» с опережением — но <em>4 стажёра</em> в зоне риска.</h2>
           <div className="h-row">
-            <div className="h-stat"><b>79.4<small>%</small></b><span>Средний балл</span></div>
-            <div className="h-stat"><b>312</b><span>Сценариев / нед</span></div>
-            <div className="h-stat"><b>+3.2<small>%</small></b><span>WoW рост</span></div>
-            <div className="h-stat"><b>92<small>%</small></b><span>Активность</span></div>
+            <div className="h-stat" style={{ cursor: 'pointer' }} onClick={() => setRoute('performance')}><b>79.4<small>%</small></b><span>Средний балл</span></div>
+            <div className="h-stat" style={{ cursor: 'pointer' }} onClick={() => setRoute('performance')}><b>312</b><span>Сценариев / нед</span></div>
+            <div className="h-stat" style={{ cursor: 'pointer' }} onClick={() => setRoute('performance')}><b>+3.2<small>%</small></b><span>WoW рост</span></div>
+            <div className="h-stat" style={{ cursor: 'pointer' }} onClick={() => setRoute('performance')}><b>92<small>%</small></b><span>Активность</span></div>
           </div>
         </div>
 
@@ -218,10 +218,10 @@ export default function HrDashboard({ setRoute, openProfile, openChat }: HrDashb
             { lbl: "70 — 79",  n: 7, kind: "cobalt", pct: 30 },
             { lbl: "60 — 69",  n: 3, kind: "warn",   pct: 13 },
             { lbl: "< 60",     n: 1, kind: "bad",    pct: 4  },
-          ].map(r => (
+          ].map((r, i) => (
             <div className="dist-row" key={r.lbl}>
               <span className="lbl">{r.lbl}</span>
-              <span className="bar"><i className={r.kind} style={{ width: (r.pct * 2.4) + "%" }} /></span>
+              <span className="bar"><i className={r.kind} style={{ '--bar-w': (r.pct * 2.4) + '%', animationDelay: `${i * 80}ms` } as React.CSSProperties} /></span>
               <span className="num">{r.n}</span>
             </div>
           ))}
@@ -236,13 +236,13 @@ export default function HrDashboard({ setRoute, openProfile, openChat }: HrDashb
               Все события →
             </a>
           </div>
-          {hrData.FEED.slice(0, 6).map(f => {
+          {hrData.FEED.slice(0, 6).map((f, idx) => {
             const e = hrData.EMPLOYEES.find(x => x.id === f.who)!
             return (
               <div
                 className="feed-row"
                 key={f.id}
-                style={{ cursor: 'pointer' }}
+                style={{ cursor: 'pointer', animationDelay: `${idx * 40}ms` }}
                 onClick={() => openProfile(f.who)}
               >
                 <div className={"av " + e.avClass}>{e.initials}</div>

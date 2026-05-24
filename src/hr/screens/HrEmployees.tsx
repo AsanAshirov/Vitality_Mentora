@@ -116,7 +116,7 @@ export function HrEmployees({ openProfile, openChat, openCall }: HrEmployeesProp
         </div>
       </div>
 
-      {showFilter && (
+      <div className={'inline-panel' + (showFilter ? ' open' : '')}>
         <div style={{ padding: '12px 16px', background: 'var(--surface)', borderBottom: '1px solid var(--line-2)', display: 'flex', gap: 16, alignItems: 'center' }}>
           <span style={{ fontSize: 12, color: 'var(--mute)' }}>Статус:</span>
           {(['online', 'busy', 'away', 'offline'] as const).map(s => {
@@ -132,10 +132,10 @@ export function HrEmployees({ openProfile, openChat, openCall }: HrEmployeesProp
           })}
           <button className="btn ghost" style={{ height: 26, fontSize: 11, marginLeft: 'auto' }} onClick={() => setFilterStatus([])}>Сбросить</button>
         </div>
-      )}
+      </div>
 
-      {showAddIntern && (
-        <div style={{ padding: '16px', background: 'var(--surface)', borderBottom: '1px solid var(--line-2)', display: 'grid', gridTemplateColumns: '1fr 1fr 1fr auto', gap: 10, alignItems: 'end' }}>
+      <div className={'inline-panel' + (showAddIntern ? ' open' : '')} style={{ marginBottom: showAddIntern ? 16 : 0 }}>
+        <div style={{ background: 'var(--surface)', border: '1px solid var(--line-2)', borderRadius: 'var(--r-lg)', padding: '18px 20px', display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr auto', gap: 10, alignItems: 'end' }}>
           <div>
             <label style={{ fontSize: 11, color: 'var(--mute)', display: 'block', marginBottom: 4 }}>Имя</label>
             <input style={{ width: '100%', height: 32, padding: '0 10px', border: '1px solid var(--line-2)', borderRadius: 'var(--r-sm)', background: 'var(--paper)', fontSize: 13 }} placeholder="Фамилия Имя" />
@@ -155,7 +155,7 @@ export function HrEmployees({ openProfile, openChat, openCall }: HrEmployeesProp
             <button className="btn ghost" style={{ height: 32 }} onClick={() => setShowAddIntern(false)}>Отмена</button>
           </div>
         </div>
-      )}
+      </div>
 
       <div className="emp-filter-bar">
         <label className="emp-search">
@@ -197,11 +197,11 @@ export function HrEmployees({ openProfile, openChat, openCall }: HrEmployeesProp
           <span>Был онлайн</span>
           <span style={{ textAlign: 'right' }}>Действия</span>
         </div>
-        {rows.map(e => {
+        {rows.map((e, idx) => {
           const tone      = scoreToTone(e.score)
           const sparkTone = e.delta > 0 ? 'good' : e.delta < 0 ? 'bad' : ''
           return (
-            <div className="emp-row" key={e.id} onClick={() => openProfile(e.id)}>
+            <div className="emp-row" key={e.id} style={{ animationDelay: `${Math.min(idx, 12) * 30}ms` }} onClick={() => openProfile(e.id)}>
               <div className="nm">
                 <div className={'av ' + e.avClass}>{e.initials}</div>
                 <div>

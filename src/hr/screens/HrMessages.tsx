@@ -14,6 +14,7 @@ export interface HrMessagesProps {
   openCall: (id: number | string, mode: string) => void
   initialConvId: string | null
   openProfile: (id: number) => void
+  onMarkRead?: (id: string) => void
 }
 
 // ---------------------------------------------------------------------------
@@ -32,9 +33,10 @@ interface ConvListProps {
   showNewMsg: boolean
   setShowNewMsg: (v: boolean) => void
   openProfile: (id: number) => void
+  readConvIds: Set<string>
 }
 
-function ConvList({ tab, setTab, q, setQ, convs, activeId, setActiveId, unread, showNewMsg, setShowNewMsg, openProfile }: ConvListProps) {
+function ConvList({ tab, setTab, q, setQ, convs, activeId, setActiveId, unread, showNewMsg, setShowNewMsg, openProfile, readConvIds }: ConvListProps) {
   return (
     <div className="conv-list">
       <div className="conv-head">
@@ -50,7 +52,11 @@ function ConvList({ tab, setTab, q, setQ, convs, activeId, setActiveId, unread, 
       {showNewMsg && (
         <div style={{borderBottom:'1px solid var(--line)', maxHeight:200, overflowY:'auto'}}>
           {hrData.EMPLOYEES.slice(0,8).map(e => (
-            <div key={e.id} onClick={() => { openProfile(e.id); setShowNewMsg(false); }}
+            <div key={e.id} onClick={() => {
+              const conv = hrData.DIRECT.find(c => c.with === e.id)
+              if (conv) setActiveId(conv.id)
+              setShowNewMsg(false)
+            }}
                  style={{padding:'8px 16px', display:'flex', alignItems:'center', gap:10, cursor:'pointer'}}
                  onMouseEnter={ev => ev.currentTarget.style.background='var(--surface-2)'}
                  onMouseLeave={ev => ev.currentTarget.style.background=''}>
@@ -68,6 +74,7 @@ function ConvList({ tab, setTab, q, setQ, convs, activeId, setActiveId, unread, 
       <div className="conv-scroll">
         {convs.map(c => {
           const e = hrData.EMPLOYEES.find(x => x.id === c.with)!
+          const isRead = readConvIds.has(c.id)
           return (
             <div className={"conv-item" + (activeId === c.id ? " active" : "")} key={c.id} onClick={() => setActiveId(c.id)}>
               <div className="av-wrap">
@@ -82,7 +89,7 @@ function ConvList({ tab, setTab, q, setQ, convs, activeId, setActiveId, unread, 
               </div>
               <div className="ci-meta">
                 <span className="ci-when">{c.lastAt}</span>
-                {c.unread ? <span className="ci-unread">{c.unread}</span> : null}
+                {c.unread && !isRead ? <span className="ci-unread">{c.unread}</span> : null}
               </div>
             </div>
           )
@@ -257,7 +264,7 @@ function Composer({ draft, setDraft, onSend, setThread }: ComposerProps) {
           <Popover open={showEmoji} anchorRef={emojiRef} onClose={() => setShowEmoji(false)} align="right">
             <div style={{display:'flex',flexWrap:'wrap',gap:6,padding:'10px 12px',width:180}}>
               {['🎉','👍','✅','❌','⚠️','💡','📝','🔥','💪','🎯','😊','👋','✋','🙏','👀'].map(em => (
-                <span key={em} style={{fontSize:20,cursor:'pointer'}} onClick={() => { setDraft(d => d+em); setShowEmoji(false) }}>{em}</span>
+                <span key={em} style={{fontSize:20,cursor:'pointer'}} onClick={() => { setDraft(draft+em); setShowEmoji(false) }}>{em}</span>
               ))}
             </div>
           </Popover>
@@ -359,21 +366,66 @@ function ChatRail({ peer, openCall, openProfile }: ChatRailProps) {
 // HrMessages — default export
 // ---------------------------------------------------------------------------
 
-export default function HrMessages({ openCall, initialConvId, openProfile }: HrMessagesProps) {
-  const [activeId, setActiveId] = useState<string>(initialConvId || "d1")
+export default function HrMessages({ openCall, initialConvId, openProfile, onMarkRead }: HrMessagesProps) {
+  const initId = initialConvId || "d1"
+  const [activeId, setActiveId] = useState<string>(initId)
   const [tab, setTab] = useState("all")
   const [q, setQ] = useState("")
   const [draft, setDraft] = useState("")
-  const [thread, setThread] = useState<ThreadMsg[]>(hrData.THREAD_D1)
+  const [thread, setThread] = useState<ThreadMsg[]>(hrData.THREADS[initId] ?? hrData.THREAD_D1)
   const [showNewMsg, setShowNewMsg] = useState(false)
   const scrollRef = useRef<HTMLDivElement>(null)
+
+  // Track which conversations have been opened (clears unread badges)
+  const [readConvIds, setReadConvIds] = useState<Set<string>>(() => new Set([initId]))
+
+  // Drag-to-resize state
+  const [convWidth, setConvWidth] = useState(320)
+  const [railWidth, setRailWidth] = useState(280)
+  const [dragging, setDragging] = useState<'conv' | 'rail' | null>(null)
+  const dragRef = useRef<{ which: 'conv' | 'rail'; startX: number; startW: number } | null>(null)
+
+  useEffect(() => {
+    const t = hrData.THREADS[activeId]
+    setThread(t ?? [])
+    setDraft("")
+    onMarkRead?.(activeId)
+    setReadConvIds(prev => new Set([...prev, activeId]))
+  }, [activeId])
 
   useEffect(() => {
     if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight
   }, [thread, activeId])
 
+  function onResizeStart(which: 'conv' | 'rail', e: React.MouseEvent) {
+    e.preventDefault()
+    const startW = which === 'conv' ? convWidth : railWidth
+    dragRef.current = { which, startX: e.clientX, startW }
+    setDragging(which)
+
+    function onMove(ev: MouseEvent) {
+      if (!dragRef.current) return
+      const dx = ev.clientX - dragRef.current.startX
+      if (dragRef.current.which === 'conv') {
+        setConvWidth(Math.max(220, Math.min(460, dragRef.current.startW + dx)))
+      } else {
+        setRailWidth(Math.max(200, Math.min(400, dragRef.current.startW - dx)))
+      }
+    }
+
+    function onUp() {
+      dragRef.current = null
+      setDragging(null)
+      window.removeEventListener('mousemove', onMove)
+      window.removeEventListener('mouseup', onUp)
+    }
+
+    window.addEventListener('mousemove', onMove)
+    window.addEventListener('mouseup', onUp)
+  }
+
   let convs = hrData.DIRECT
-  if (tab === "unread") convs = convs.filter(c => c.unread > 0)
+  if (tab === "unread") convs = convs.filter(c => c.unread > 0 && !readConvIds.has(c.id))
   else if (tab === "active") convs = convs.filter(c => {
     const e = hrData.EMPLOYEES.find(x => x.id === c.with)
     return e?.status === "online"
@@ -385,26 +437,38 @@ export default function HrMessages({ openCall, initialConvId, openProfile }: HrM
 
   const active = hrData.DIRECT.find(c => c.id === activeId)
   const peer = active ? hrData.EMPLOYEES.find(e => e.id === active.with) ?? null : null
-  const unread = hrData.DIRECT.filter(c => c.unread > 0).length
+  const unread = hrData.DIRECT.filter(c => c.unread > 0 && !readConvIds.has(c.id)).length
 
   function send() {
     if (!draft.trim()) return
     setThread(t => [...t, { kind: "msg", from: 0, text: draft, time: "сейчас" }])
     setDraft("")
-    // simulate reply
     setTimeout(() => {
-      setThread(t => [...t, { kind: "msg", from: active?.with || 1, text: "Принято, спасибо!", time: "сейчас" }])
+      if (peer) setThread(t => [...t, { kind: "msg", from: peer.id, text: "Принято, спасибо!", time: "сейчас" }])
     }, 1400)
   }
 
+  const cols = peer
+    ? `${convWidth}px 4px 1fr 4px ${railWidth}px`
+    : `${convWidth}px 4px 1fr`
+
   return (
-    <div className="msg-shell">
+    <div
+      className="msg-shell"
+      style={{ gridTemplateColumns: cols, userSelect: dragging ? 'none' : undefined }}
+    >
       <ConvList
         tab={tab} setTab={setTab} q={q} setQ={setQ}
         convs={convs} activeId={activeId} setActiveId={setActiveId}
         unread={unread}
         showNewMsg={showNewMsg} setShowNewMsg={setShowNewMsg}
         openProfile={openProfile}
+        readConvIds={readConvIds}
+      />
+
+      <div
+        className={"resize-handle" + (dragging === 'conv' ? ' dragging' : '')}
+        onMouseDown={e => onResizeStart('conv', e)}
       />
 
       {peer ? (
@@ -426,7 +490,15 @@ export default function HrMessages({ openCall, initialConvId, openProfile }: HrM
         </div>
       )}
 
-      {peer ? <ChatRail peer={peer} openCall={openCall} openProfile={openProfile} /> : null}
+      {peer ? (
+        <>
+          <div
+            className={"resize-handle" + (dragging === 'rail' ? ' dragging' : '')}
+            onMouseDown={e => onResizeStart('rail', e)}
+          />
+          <ChatRail peer={peer} openCall={openCall} openProfile={openProfile} />
+        </>
+      ) : null}
     </div>
   )
 }

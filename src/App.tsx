@@ -5,6 +5,7 @@ import { useSettingsStore } from './store/settingsStore'
 import { useUserStore } from './store/userStore'
 import Clicky from './components/Clicky'
 import SidePanel from './components/SidePanel'
+import AiAssistant from './components/AiAssistant'
 import HrApp from './hr/HrApp'
 import RoleSwitcher from './hr/RoleSwitcher'
 
@@ -79,6 +80,7 @@ export default function App() {
             />
           )}
           <SidePanel summoned={summoned} setSummoned={setSummoned} />
+          <AiAssistant />
         </>
       )}
       <RoleSwitcher />

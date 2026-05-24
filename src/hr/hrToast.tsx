@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react'
 import hrData from './hrData'
 import { Ihr } from './iconsHr'
+import { useSettingsStore } from '../store/settingsStore'
 
 // ---------------------------------------------------------------------------
 // Toast singleton
@@ -243,6 +244,7 @@ export interface UserMenuPopoverProps {
 }
 
 export function UserMenuPopover({ open, anchorRef, onClose, onAction }: UserMenuPopoverProps) {
+  const [status, setStatus] = useState<'online'|'dnd'>('online')
   return (
     <Popover open={open} anchorRef={anchorRef} onClose={onClose} align="right" className="user-pop">
       <div className="user-pop-head">
@@ -275,7 +277,8 @@ export function UserMenuPopover({ open, anchorRef, onClose, onAction }: UserMenu
       <div className="popover-title">Статус</div>
       <button
         className="popover-item"
-        onClick={() => { hrToast("Статус: в сети", { kind: "good" }); onClose?.() }}
+        style={status === 'online' ? {fontWeight:600} : undefined}
+        onClick={() => { setStatus('online'); hrToast('Статус: в сети', {kind:'good'}); onClose?.() }}
       >
         <span className="ico">
           <span style={{ display: 'inline-block', width: 8, height: 8, borderRadius: '50%', background: 'var(--good)' }} />
@@ -284,7 +287,8 @@ export function UserMenuPopover({ open, anchorRef, onClose, onAction }: UserMenu
       </button>
       <button
         className="popover-item"
-        onClick={() => { hrToast("Статус: не беспокоить", { kind: "warn" }); onClose?.() }}
+        style={status === 'dnd' ? {fontWeight:600} : undefined}
+        onClick={() => { setStatus('dnd'); hrToast('Статус: не беспокоить', {kind:'warn'}); onClose?.() }}
       >
         <span className="ico">
           <span style={{ display: 'inline-block', width: 8, height: 8, borderRadius: '50%', background: 'var(--bad)' }} />
@@ -294,7 +298,10 @@ export function UserMenuPopover({ open, anchorRef, onClose, onAction }: UserMenu
       <div className="popover-sep" />
       <button
         className="popover-item"
-        onClick={() => { hrToast("Выход выполнен · возврат к экрану входа"); onClose?.() }}
+        onClick={() => {
+          useSettingsStore.getState().setRole('intern')
+          onClose?.()
+        }}
       >
         <Ihr.ArrowL size={15} className="ico" /> Выйти
       </button>

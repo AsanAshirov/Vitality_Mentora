@@ -1,5 +1,14 @@
 /* ===== Mentora HR — extends mentora design system ===== */
 
+:root {
+  --dur-xs:       80ms;
+  --dur-sm:      120ms;
+  --dur-md:      220ms;
+  --dur-lg:      320ms;
+  --ease-out:    cubic-bezier(0.2, 0.8, 0.2, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
 /* ============ Page chrome ============ */
 
 .app-hr .page {
@@ -931,12 +940,32 @@
 
 .msg-shell {
   display: grid;
-  grid-template-columns: 320px 1fr 280px;
+  grid-template-columns: 320px 4px 1fr 4px 280px;
   height: 100%;
   background: var(--surface);
   min-height: 0;
 }
-.msg-shell.no-right { grid-template-columns: 320px 1fr; }
+
+/* Drag-to-resize handle between panels */
+.resize-handle {
+  width: 4px;
+  cursor: col-resize;
+  background: transparent;
+  position: relative;
+  z-index: 10;
+  transition: background var(--dur-xs);
+  flex-shrink: 0;
+}
+.resize-handle::after {
+  content: "";
+  position: absolute;
+  top: 0; bottom: 0;
+  left: -3px; right: -3px;
+}
+.resize-handle:hover,
+.resize-handle.dragging {
+  background: var(--cobalt);
+}
 
 .conv-list {
   border-right: 1px solid var(--line);
@@ -1444,6 +1473,39 @@
   box-shadow: 0 0 0 3px rgba(255,59,48,0.18);
   animation: call-pip 2s ease-in-out infinite;
 }
+/* ============================================================
+   Animation keyframes — polish layer
+   ============================================================ */
+
+@keyframes page-enter {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes row-enter {
+  from { opacity: 0; transform: translateX(-6px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes chart-draw {
+  to { stroke-dashoffset: 0; }
+}
+
+@keyframes bar-grow {
+  from { width: 0; }
+  to   { width: var(--bar-w, 100%); }
+}
+
+@keyframes status-pulse {
+  0%, 100% { box-shadow: 0 0 0 2px rgba(11, 143, 92, 0.2); }
+  50%       { box-shadow: 0 0 0 4px rgba(11, 143, 92, 0); }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
 @keyframes call-pip {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.4; }
@@ -2199,3 +2261,110 @@
 }
 .toggle.on { background: var(--cobalt); }
 .toggle.on::after { left: 19px; }
+
+/* ============================================================
+   Visual polish — animations, hover lifts, micro-interactions
+   ============================================================ */
+
+/* Page entry — fires on every route change because screen is remounted with key={route} */
+.app-hr .page {
+  animation: page-enter var(--dur-lg) var(--ease-out) both;
+}
+/* Messages and Groups are fullbleed panels — no slide */
+.app-hr .app-main.fullbleed > .page {
+  animation: none;
+}
+
+/* Card hover lifts */
+.kpi,
+.cohort-card,
+.feed-card,
+.schedule-card,
+.perf-tile,
+.rwd-card {
+  transition:
+    transform var(--dur-sm) var(--ease-out),
+    box-shadow var(--dur-sm) var(--ease-out);
+}
+.kpi:hover,
+.perf-tile:hover,
+.rwd-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.09);
+}
+.cohort-card:hover,
+.feed-card:hover,
+.schedule-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+/* Staggered list rows — delay set via inline style animationDelay in TSX */
+.app-hr .feed-row,
+.app-hr .emp-row,
+.app-hr .pod-row {
+  animation: row-enter var(--dur-md) var(--ease-out) both;
+}
+
+/* Heatmap cell hover */
+.cell {
+  transition:
+    transform var(--dur-xs) var(--ease-out),
+    box-shadow var(--dur-xs) var(--ease-out);
+}
+.cell:hover {
+  transform: scale(1.12);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  position: relative;
+  z-index: 1;
+}
+
+/* Collapsible inline panels (showAddIntern, showFilter, etc.) */
+.inline-panel {
+  overflow: hidden;
+  max-height: 0;
+  opacity: 0;
+  transition:
+    max-height var(--dur-lg) var(--ease-in-out),
+    opacity    var(--dur-md) var(--ease-out);
+}
+.inline-panel.open {
+  max-height: 300px;
+  opacity: 1;
+}
+
+/* Online status dot pulse */
+.st.online::before {
+  animation: status-pulse 2.4s ease-in-out infinite;
+}
+
+/* Sidebar nav active indicator — animated left bar */
+.app-hr .nav-item {
+  position: relative;
+}
+.app-hr .nav-item::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 20%;
+  bottom: 20%;
+  width: 3px;
+  border-radius: 0 2px 2px 0;
+  background: var(--cobalt);
+  transform: scaleY(0);
+  transform-origin: center;
+  transition: transform var(--dur-sm) var(--ease-out);
+}
+.app-hr .nav-item.active::before {
+  transform: scaleY(1);
+}
+
+/* Distribution bar animation — width animated via --bar-w custom property */
+.dist-row .bar > i {
+  animation: bar-grow var(--dur-lg) var(--ease-out) both;
+}
+
+/* KPI / perf sparklines fade in */
+.perf-tile .mini-spark {
+  animation: fade-in var(--dur-lg) var(--ease-out) both;
+}
