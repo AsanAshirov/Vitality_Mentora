@@ -285,18 +285,6 @@ export default function AiAssistant() {
     )
   }, [busy, lang, ttsOn, docCtx])
 
-  // Receive PTT result from Clicky backtick press (must be after send is defined)
-  useEffect(() => {
-    const handler = (e: Event) => {
-      const text = (e as CustomEvent<string>).detail
-      if (!text) return
-      setOpen(true)
-      setTimeout(() => send(text), 100)
-    }
-    window.addEventListener('clicky-ptt-result', handler)
-    return () => window.removeEventListener('clicky-ptt-result', handler)
-  }, [send])
-
   // ── Voice input ───────────────────────────────────────────────────────────
 
   const toggleSTT = useCallback(() => {
