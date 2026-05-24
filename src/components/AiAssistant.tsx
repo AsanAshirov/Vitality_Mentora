@@ -197,18 +197,6 @@ export default function AiAssistant() {
     if (!open) stopSpeaking()
   }, [open])
 
-  // Receive PTT result from Clicky backtick press
-  useEffect(() => {
-    const handler = (e: Event) => {
-      const text = (e as CustomEvent<string>).detail
-      if (!text) return
-      setOpen(true)
-      setTimeout(() => send(text), 100)
-    }
-    window.addEventListener('clicky-ptt-result', handler)
-    return () => window.removeEventListener('clicky-ptt-result', handler)
-  }, [send])
-
   // Hide FAB while user is typing anywhere on the page (except inside this panel)
   useEffect(() => {
     const onFocusIn = (e: FocusEvent) => {
@@ -296,6 +284,18 @@ export default function AiAssistant() {
       capturedDoc?.content,
     )
   }, [busy, lang, ttsOn, docCtx])
+
+  // Receive PTT result from Clicky backtick press (must be after send is defined)
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const text = (e as CustomEvent<string>).detail
+      if (!text) return
+      setOpen(true)
+      setTimeout(() => send(text), 100)
+    }
+    window.addEventListener('clicky-ptt-result', handler)
+    return () => window.removeEventListener('clicky-ptt-result', handler)
+  }, [send])
 
   // ── Voice input ───────────────────────────────────────────────────────────
 
