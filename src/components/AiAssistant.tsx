@@ -590,16 +590,15 @@ export default function AiAssistant() {
           width: open ? 'auto' : 40,
           height: 40,
           padding: open ? '0 15px' : '0',
-          // Transparent glass look — visible but not opaque
           background: open
             ? 'rgba(8, 12, 28, 0.55)'
-            : 'rgba(20, 48, 180, 0.28)',
+            : 'linear-gradient(135deg, rgba(32,70,255,0.92), rgba(60,100,255,0.85))',
           backdropFilter: 'blur(18px) saturate(160%)',
           WebkitBackdropFilter: 'blur(18px) saturate(160%)',
-          color: 'rgba(180, 205, 255, 0.95)',
+          color: '#fff',
           border: open
             ? '1px solid rgba(32,70,255,0.5)'
-            : '1px solid rgba(80,120,255,0.4)',
+            : '1px solid rgba(32,70,255,0.2)',
           borderRadius: 999,
           fontWeight: 600,
           fontSize: 13,
