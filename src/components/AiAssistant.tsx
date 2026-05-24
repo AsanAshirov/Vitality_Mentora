@@ -169,6 +169,7 @@ export default function AiAssistant() {
   const [ttsOn, setTtsOn] = useState(false)
   const [recording, setRecording] = useState(false)
   const [docCtx, setDocCtx] = useState<{ name: string; content: string } | null>(null)
+  const [inputFocused, setInputFocused] = useState(false)
 
   const bodyRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
@@ -195,6 +196,23 @@ export default function AiAssistant() {
   useEffect(() => {
     if (!open) stopSpeaking()
   }, [open])
+
+  // Hide FAB while user is typing anywhere on the page (except inside this panel)
+  useEffect(() => {
+    const onFocusIn = (e: FocusEvent) => {
+      const target = e.target as HTMLElement
+      const isInput = target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable
+      const isOwnInput = inputRef.current?.contains(target)
+      if (isInput && !isOwnInput) setInputFocused(true)
+    }
+    const onFocusOut = () => setInputFocused(false)
+    document.addEventListener('focusin', onFocusIn)
+    document.addEventListener('focusout', onFocusOut)
+    return () => {
+      document.removeEventListener('focusin', onFocusIn)
+      document.removeEventListener('focusout', onFocusOut)
+    }
+  }, [])
 
   // ── Send message ──────────────────────────────────────────────────────────
 
@@ -335,14 +353,14 @@ export default function AiAssistant() {
       {open && (
         <div style={{
           position: 'fixed',
-          bottom: 84,
-          right: 24,
-          width: 390,
-          height: 560,
-          borderRadius: 20,
+          bottom: 130,
+          right: 20,
+          width: 370,
+          height: 520,
+          borderRadius: 18,
           display: 'flex',
           flexDirection: 'column',
-          zIndex: 9998,
+          zIndex: 8999,
           overflow: 'hidden',
           ...glass.panel,
         }}>
@@ -555,45 +573,53 @@ export default function AiAssistant() {
         </div>
       )}
 
-      {/* ── FAB button ── */}
+      {/* ── FAB button — icon-only when closed, hidden while typing elsewhere ── */}
       <button
         className="ai-fab"
         onClick={() => setOpen(v => !v)}
         title="Mentora AI"
         style={{
           position: 'fixed',
-          bottom: 24,
-          right: 24,
-          zIndex: 9999,
+          bottom: 80,
+          right: 20,
+          zIndex: 9000,
           display: 'flex',
           alignItems: 'center',
-          gap: 8,
-          padding: '10px 18px',
+          justifyContent: 'center',
+          gap: open ? 7 : 0,
+          width: open ? 'auto' : 40,
+          height: 40,
+          padding: open ? '0 15px' : '0',
           background: open
-            ? 'rgba(10,14,31,0.82)'
+            ? 'rgba(8, 12, 28, 0.55)'
             : 'linear-gradient(135deg, rgba(32,70,255,0.92), rgba(60,100,255,0.85))',
-          backdropFilter: 'blur(16px)',
-          WebkitBackdropFilter: 'blur(16px)',
-          color: open ? 'rgba(150,180,255,1)' : '#fff',
-          border: open ? '1px solid rgba(32,70,255,0.4)' : '1px solid rgba(32,70,255,0.25)',
+          backdropFilter: 'blur(18px) saturate(160%)',
+          WebkitBackdropFilter: 'blur(18px) saturate(160%)',
+          color: '#fff',
+          border: open
+            ? '1px solid rgba(32,70,255,0.5)'
+            : '1px solid rgba(32,70,255,0.2)',
           borderRadius: 999,
           fontWeight: 600,
-          fontSize: 14,
+          fontSize: 13,
           cursor: 'pointer',
-          boxShadow: open
-            ? '0 4px 20px rgba(0,0,0,0.3)'
-            : '0 4px 24px rgba(32,70,255,0.45)',
-          transition: 'all .2s ease',
+          boxShadow: '0 2px 14px rgba(32,70,255,0.18)',
+          // Fade out when user is typing (and panel is closed)
+          opacity: inputFocused && !open ? 0 : 1,
+          pointerEvents: inputFocused && !open ? 'none' : 'auto',
+          transition: 'opacity .25s ease, background .2s ease, width .2s ease',
           userSelect: 'none',
           whiteSpace: 'nowrap',
+          overflow: 'hidden',
         }}
       >
-        <span style={{ fontSize: 15 }}>✦</span>
-        Mentora AI
+        <span style={{ fontSize: 15, flexShrink: 0, opacity: 0.9 }}>✦</span>
+        {open && <span style={{ marginLeft: 2 }}>Mentora AI</span>}
         {!open && busy && (
           <span style={{
-            width: 7, height: 7, borderRadius: '50%',
-            background: '#4ade80', display: 'inline-block',
+            position: 'absolute', top: 7, right: 7,
+            width: 6, height: 6, borderRadius: '50%',
+            background: '#4ade80',
           }} />
         )}
       </button>
