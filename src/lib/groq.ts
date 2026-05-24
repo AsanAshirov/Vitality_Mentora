@@ -1,43 +1,45 @@
-// groq.ts — Groq streaming client (Llama 3) for Mentora AI fallback
+// groq.ts — Groq streaming client (fallback for Gemini)
 import Groq from 'groq-sdk'
 
-const MODELS = ['llama-3.3-70b-versatile', 'llama-3.1-8b-instant']
+const KEY = import.meta.env.VITE_GROQ_KEY as string | undefined
 
 export async function streamGroqAnswer(
-  systemPrompt: string,
   question: string,
-  onChunk: (text: string) => void,
-): Promise<string> {
-  const GROQ_KEY = import.meta.env.VITE_GROQ_KEY as string
-  if (!GROQ_KEY) throw new Error('No GROQ key')
-  // dangerouslyAllowBrowser: true because this is a local-only training tool
-  const groq = new Groq({ apiKey: GROQ_KEY, dangerouslyAllowBrowser: true })
+  lang: string,
+  systemPrompt: string,
+  onChunk: (chunk: string) => void,
+  onDone: (full: string, citations: string[]) => void,
+  onError: (err: unknown) => void,
+): Promise<void> {
+  if (!KEY) { onError('No Groq key'); return }
 
-  let lastErr = ''
-  for (const model of MODELS) {
-    try {
-      const stream = await groq.chat.completions.create({
-        model,
-        messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: question },
-        ],
-        stream: true,
-        max_tokens: 500,
-        temperature: 0,
-        top_p: 0.95,
-      })
+  const client = new Groq({ apiKey: KEY, dangerouslyAllowBrowser: true })
 
-      let full = ''
-      for await (const chunk of stream) {
-        const text = chunk.choices[0]?.delta?.content ?? ''
-        if (text) { full += text; onChunk(text) }
-      }
-      return full
-    } catch (err) {
-      lastErr = err instanceof Error ? err.message : String(err)
-      if (!lastErr.includes('429') && !lastErr.includes('503') && !lastErr.includes('overload')) break
+  try {
+    const stream = await client.chat.completions.create({
+      model: 'llama-3.3-70b-versatile',
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: question },
+      ],
+      stream: true,
+      max_tokens: 512,
+    })
+
+    let full = ''
+    for await (const chunk of stream) {
+      const delta = chunk.choices[0]?.delta?.content ?? ''
+      if (delta) { full += delta; onChunk(delta) }
     }
+
+    const citations = extractCitations(full)
+    onDone(full, citations)
+  } catch (err) {
+    onError(err)
   }
-  throw new Error(lastErr)
+}
+
+function extractCitations(text: string): string[] {
+  const matches = text.match(/\b(KYC-PROC|AML-HB|SANCTIONS-PROC|TRANSFER-OPS|DEPOSIT-OPS|CARD-ISSUE|SWIFT-LIMITS|FX-RATES|PEP-HB|ESCAL-PROC)\b/g)
+  return matches ? [...new Set(matches)] : []
 }
