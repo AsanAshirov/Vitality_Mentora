@@ -335,14 +335,14 @@ export default function AiAssistant() {
       {open && (
         <div style={{
           position: 'fixed',
-          bottom: 84,
-          right: 24,
-          width: 390,
-          height: 560,
-          borderRadius: 20,
+          bottom: 76,
+          right: 20,
+          width: 370,
+          height: 520,
+          borderRadius: 18,
           display: 'flex',
           flexDirection: 'column',
-          zIndex: 9998,
+          zIndex: 8999,
           overflow: 'hidden',
           ...glass.panel,
         }}>
@@ -555,7 +555,7 @@ export default function AiAssistant() {
         </div>
       )}
 
-      {/* ── FAB button ── */}
+      {/* ── FAB button — icon-only when closed ── */}
       <button
         className="ai-fab"
         onClick={() => setOpen(v => !v)}
@@ -563,37 +563,42 @@ export default function AiAssistant() {
         style={{
           position: 'fixed',
           bottom: 24,
-          right: 24,
-          zIndex: 9999,
+          right: 20,
+          zIndex: 9000,
           display: 'flex',
           alignItems: 'center',
-          gap: 8,
-          padding: '10px 18px',
+          justifyContent: 'center',
+          gap: open ? 7 : 0,
+          width: open ? 'auto' : 42,
+          height: 42,
+          padding: open ? '0 16px' : '0',
           background: open
-            ? 'rgba(10,14,31,0.82)'
+            ? 'rgba(10,14,31,0.88)'
             : 'linear-gradient(135deg, rgba(32,70,255,0.92), rgba(60,100,255,0.85))',
           backdropFilter: 'blur(16px)',
           WebkitBackdropFilter: 'blur(16px)',
           color: open ? 'rgba(150,180,255,1)' : '#fff',
-          border: open ? '1px solid rgba(32,70,255,0.4)' : '1px solid rgba(32,70,255,0.25)',
+          border: open ? '1px solid rgba(32,70,255,0.45)' : '1px solid rgba(32,70,255,0.2)',
           borderRadius: 999,
           fontWeight: 600,
-          fontSize: 14,
+          fontSize: 13,
           cursor: 'pointer',
           boxShadow: open
-            ? '0 4px 20px rgba(0,0,0,0.3)'
-            : '0 4px 24px rgba(32,70,255,0.45)',
+            ? '0 2px 12px rgba(0,0,0,0.25)'
+            : '0 3px 16px rgba(32,70,255,0.4)',
           transition: 'all .2s ease',
           userSelect: 'none',
           whiteSpace: 'nowrap',
+          overflow: 'hidden',
         }}
       >
-        <span style={{ fontSize: 15 }}>✦</span>
-        Mentora AI
+        <span style={{ fontSize: open ? 14 : 16, flexShrink: 0 }}>✦</span>
+        {open && 'Mentora AI'}
         {!open && busy && (
           <span style={{
-            width: 7, height: 7, borderRadius: '50%',
-            background: '#4ade80', display: 'inline-block',
+            position: 'absolute', top: 8, right: 8,
+            width: 6, height: 6, borderRadius: '50%',
+            background: '#4ade80',
           }} />
         )}
       </button>

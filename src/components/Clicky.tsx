@@ -99,7 +99,8 @@ function Clicky({
   useEffect(() => {
     if (!enabled) return
     const onMove = (e: MouseEvent) => {
-      cursorPos.current = { x: e.clientX + 16, y: e.clientY - 10 }
+      // Trail 28px right + 22px below cursor so it never sits on click targets
+      cursorPos.current = { x: e.clientX + 28, y: e.clientY + 22 }
     }
     window.addEventListener('mousemove', onMove)
     return () => window.removeEventListener('mousemove', onMove)
