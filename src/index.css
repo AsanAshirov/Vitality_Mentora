@@ -3736,3 +3736,15 @@ body.resizing-h, body.resizing-v { user-select: none; }
 /* ===== Toast ===== */
 .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: var(--ink-2); color: #fff; padding: 10px 20px; border-radius: var(--r-md); font-size: 13px; z-index: 2000; animation: toast-in .2s ease; }
 @keyframes toast-in { from { opacity: 0; transform: translateX(-50%) translateY(8px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
+
+/* ===== Emoji picker (large grid) ===== */
+.emoji-menu-large { display: grid; grid-template-columns: repeat(10, 1fr); gap: 2px; width: 320px; padding: 8px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-md); box-shadow: var(--shadow-lg); }
+.emoji-menu-large button { font-size: 20px; padding: 4px; border: none; background: transparent; border-radius: var(--r-sm); cursor: pointer; line-height: 1; transition: background .1s; }
+.emoji-menu-large button:hover { background: var(--surface-2); }
+
+/* ===== Gemini streaming cursor ===== */
+.stream-cursor { display: inline-block; animation: blink .7s step-end infinite; margin-left: 2px; color: var(--cobalt); font-size: 14px; }
+@keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0; } }
+
+/* ===== Chat mic recording state ===== */
+.msg-att.recording, .chat-input button.recording { color: var(--bad) !important; }

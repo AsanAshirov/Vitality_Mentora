@@ -1,10 +1,8 @@
-// Clicky.tsx — cursor companion that rests in the side panel.
-// • At rest: positioned over the panel's "home" slot (id="clicky-rest").
-// • Summoned: hold backtick (`) OR press the "Призвать" button → leaves the
-//   panel and follows the cursor with a small upper-right offset.
-// • Release / press "Вернуть" → glides back home.
-// Settings (color, name, language) come from props.
+// Clicky.tsx — cursor companion with Google TTS voice + STT
 import React, { useState, useEffect, useRef } from 'react'
+import { speak, stopSpeaking } from '../lib/tts'
+import { startListening, isSTTSupported } from '../lib/stt'
+import { useSettingsStore } from '../store/settingsStore'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -61,6 +59,7 @@ function Clicky({
   autoSummoned = false,
   color = '#2046FF',
 }: ClickyProps) {
+  const lang = useSettingsStore(s => s.lang)
   const cursorPos = useRef<Pos>({
     x: typeof window !== 'undefined' ? window.innerWidth / 2 : 600,
     y: typeof window !== 'undefined' ? window.innerHeight / 2 : 400,
@@ -77,9 +76,24 @@ function Clicky({
     bottom: number
   } | null>(null)
   const [listening, setListening] = useState(false)
+  const stopSTT = useRef<(() => void) | null>(null)
+  const prevMsgText = useRef<string | undefined>(undefined)
 
   const effectiveSummoned = summoned || autoSummoned
   const pos = useEasedFollow(followTarget, 0.22)
+
+  // Speak Clicky message when it changes (after effectiveSummoned is computed)
+  useEffect(() => {
+    const text = message?.text
+    if (text && text !== prevMsgText.current && effectiveSummoned) {
+      prevMsgText.current = text
+      void speak(text, lang)
+    }
+    if (!effectiveSummoned) {
+      stopSpeaking()
+      prevMsgText.current = undefined
+    }
+  })
 
   // Track cursor
   useEffect(() => {
@@ -160,19 +174,32 @@ function Clicky({
     }
   }, [mode, target, effectiveSummoned])
 
-  // Push-to-talk / summon — hold backtick
+  // Push-to-talk / summon — hold backtick + STT
   useEffect(() => {
     if (!enabled) return
     const down = (e: KeyboardEvent) => {
       if (e.key === '`' && !e.repeat) {
         setListening(true)
         setSummoned(true)
+        if (isSTTSupported()) {
+          const stop = startListening(
+            lang,
+            (text) => {
+              // Show transcribed text in a new message bubble
+              console.log('Clicky STT:', text)
+            },
+            () => { setListening(false) },
+          )
+          stopSTT.current = stop
+        }
       }
     }
     const up = (e: KeyboardEvent) => {
       if (e.key === '`') {
         setListening(false)
         setSummoned(false)
+        stopSTT.current?.()
+        stopSTT.current = null
       }
     }
     window.addEventListener('keydown', down)
