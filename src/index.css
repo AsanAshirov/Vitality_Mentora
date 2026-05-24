@@ -3081,11 +3081,20 @@ a { color: inherit; text-decoration: none; }
 
 /* ============ Messages page ============ */
 
+/* .main must not scroll when messages page is active — the inner panels handle their own scroll */
+.main:has(.msg-shell) {
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
 .msg-shell {
   display: grid;
-  grid-template-columns: 320px 1fr;
-  height: 100%;
+  grid-template-columns: var(--msg-list-w, 320px) 1fr;
+  flex: 1;
+  min-height: 0;
   background: var(--paper);
+  overflow: hidden;
 }
 
 .msg-list {
@@ -3175,7 +3184,7 @@ a { color: inherit; text-decoration: none; }
 }
 
 /* Thread */
-.msg-thread { display: flex; flex-direction: column; min-width: 0; background: var(--paper); }
+.msg-thread { display: flex; flex-direction: column; min-width: 0; min-height: 0; overflow: hidden; background: var(--paper); }
 .msg-thread-head {
   display: flex; align-items: center; gap: 12px;
   padding: 14px 22px;
@@ -3694,8 +3703,7 @@ body.resizing-h, body.resizing-v { user-select: none; }
 .sidebar { position: relative; }
 .side-panel .sp-body { position: relative; }
 
-/* Messages list + thread are inside .msg-shell — give list a var width */
-.msg-shell { grid-template-columns: var(--msg-list-w) 1fr; }
+/* Resizable msg-list handle */
 .msg-list { position: relative; }
 
 /* SimShell side + rail use variables, both anchorable */
