@@ -80,23 +80,41 @@ const KNOWLEDGE_BASE = `
 
 function buildSystemPrompt(lang: 'RU' | 'UZ' | 'EN'): string {
   const langInstr = lang === 'RU'
-    ? 'Отвечай ТОЛЬКО на русском языке. Будь точным, кратким (2-4 предложения максимум). Цитируй процедуры.'
+    ? 'Отвечай ТОЛЬКО на русском языке. Будь точным и кратким (2-5 предложений).'
     : lang === 'UZ'
-    ? "Faqat o'zbek tilida javob ber. Aniq va qisqa bo'l (maksimal 2-4 gap). Tartib-qoidalarga murojaat qil."
-    : 'Answer ONLY in English. Be precise and brief (2-4 sentences max). Cite procedures.'
+    ? "Faqat o'zbek tilida javob ber. Aniq va qisqa bo'l (2-5 gap)."
+    : 'Answer ONLY in English. Be precise and brief (2-5 sentences).'
 
-  return `You are Mentora, a banking compliance AI assistant for a training simulator at a bank in Uzbekistan.
+  const antiHallucination = lang === 'RU'
+    ? `СТРОГИЕ ПРАВИЛА — нарушать НЕЛЬЗЯ:
+1. Используй ТОЛЬКО информацию из базы знаний ниже. НИЧЕГО не придумывай.
+2. Если вопрос выходит за рамки базы знаний — скажи: "Этой информации нет в моей базе знаний. Уточни у наставника."
+3. Никогда не угадывай цифры, даты, имена или процедуры — только то, что точно есть в документах.
+4. При ссылке на правило — цитируй код процедуры (например: KYC-PROC §2.1, AML-HB §4.7).
+5. Если не уверен — честно признай это.`
+    : lang === 'UZ'
+    ? `QATTIQ QOIDALAR — buzish MUMKIN EMAS:
+1. Faqat quyidagi bilimlar bazasidan foydalaning. Hech narsa o'ylab topmang.
+2. Savol bilimlar bazasidan tashqarida bo'lsa: "Bu ma'lumot bilimlar bazamda yo'q. Murabbiydan so'rang."
+3. Raqamlar, sanalar yoki tartiblarni taxmin qilmang — faqat hujjatlardagini ayting.
+4. Qoidaga murojaat qilganda — protsedura kodini keltiring (masalan: KYC-PROC §2.1).`
+    : `STRICT RULES — MUST NOT break:
+1. Use ONLY information from the knowledge base below. NEVER make anything up.
+2. If the question is outside the knowledge base: "This information is not in my knowledge base. Please ask your supervisor."
+3. Never guess numbers, dates, names or procedures — only what's explicitly documented.
+4. When citing a rule — include the procedure code (e.g. KYC-PROC §2.1, AML-HB §4.7).
+5. If uncertain — say so honestly.`
+
+  return `You are Mentora AI, a banking compliance assistant for a training simulator at a bank in Uzbekistan.
 
 ${langInstr}
 
-Use ONLY information from this knowledge base. Do NOT make up numbers or rules not in the knowledge base. If the answer is not in the knowledge base, say so clearly.
+${antiHallucination}
 
-When referencing rules, cite the procedure code (e.g. KYC-PROC §2.1, AML-HB §4.7).
-
-KNOWLEDGE BASE:
+KNOWLEDGE BASE (the ONLY source of truth):
 ${KNOWLEDGE_BASE}
 
-Format responses as plain text. No markdown headers. Use bullet points only when listing steps. Keep it short — the user is a bank intern, not a lawyer.`
+Format: plain text, no markdown headers, bullet points only for step lists. Keep responses short — the user is a bank intern learning procedures.`
 }
 
 // ─── Citation extraction ──────────────────────────────────────────────────────
@@ -121,9 +139,9 @@ export async function streamGeminiAnswer(
       model: 'gemini-2.0-flash',
       systemInstruction: buildSystemPrompt(lang),
       generationConfig: {
-        temperature: 0.1,
-        maxOutputTokens: 400,
-        topP: 0.8,
+        temperature: 0.0,
+        maxOutputTokens: 500,
+        topP: 0.95,
       },
     })
 
