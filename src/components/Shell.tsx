@@ -14,7 +14,6 @@ const ROUTE_MAP: Record<string, string> = {
   knowledge:  '/knowledge',
   messages:   '/messages',
   badges:     '/badges',
-  hr:         '/hr',
   profile:    '/profile',
   settings:   '/settings',
 };
@@ -41,7 +40,6 @@ export function Sidebar() {
     { id: 'knowledge', label: 'База знаний', Icon: I.Book },
     { id: 'messages',  label: 'Сообщения',   Icon: I.Chat,   badge: '10' },
     { id: 'badges',    label: 'Награды',     Icon: I.Trophy },
-    { id: 'hr',        label: 'HR',          Icon: I.User },
   ];
   const personalItems = [
     { id: 'profile',  label: 'Профиль',   Icon: I.User },
@@ -100,6 +98,21 @@ export function Sidebar() {
             <b>Алексей П.</b>
             <span>Ур. {level} · {xp.toLocaleString('ru-RU')} XP</span>
           </div>
+        </button>
+        <button
+          onClick={() => navigate('/portal')}
+          style={{
+            width: '100%', marginTop: 8,
+            padding: '7px 10px', borderRadius: 8, fontSize: 12,
+            background: 'transparent', border: '1px solid var(--line)',
+            color: 'var(--mute)', cursor: 'pointer',
+            display: 'flex', alignItems: 'center', gap: 6,
+            transition: 'color .15s, border-color .15s',
+          }}
+          onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = 'var(--ink)'; (e.currentTarget as HTMLElement).style.borderColor = 'var(--cobalt)' }}
+          onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'var(--mute)'; (e.currentTarget as HTMLElement).style.borderColor = 'var(--line)' }}
+        >
+          <span style={{ fontSize: 14 }}>⇄</span> Сменить портал
         </button>
       </div>
 

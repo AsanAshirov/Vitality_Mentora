@@ -13,6 +13,7 @@ import { OpenAccountScenario, DepositScenario, TransferScenario, CardIssueScenar
 import { AccountsPage, DepositsPage, TransfersPage, CardsPage, SanctionsListPage, PepPage, AmlPage, HandbookPage, ActivityPage } from './screens/simulator/SimPages'
 import { KnowledgePage, BadgesPage, ProfilePage, SettingsPage } from './screens/personal/PersonalScreens'
 import HRDashboard from './screens/HRDashboard'
+import PortalSelector, { getPortalRole } from './screens/PortalSelector'
 import WeekBriefModal from './components/modals/WeekBriefModal'
 import SearchModal from './components/modals/SearchModal'
 import { useUserStore } from './store/userStore'
@@ -112,37 +113,51 @@ function AppLayout() {
 
 // ─── Router ───────────────────────────────────────────────────────────────────
 
+// ─── Root guard — redirect to /portal if no role chosen yet ──────────────────
+
+function RootGuard() {
+  const role = getPortalRole()
+  if (!role) return <Navigate to="/portal" replace />
+  return <DashboardWrapper />
+}
+
+// ─── Router ───────────────────────────────────────────────────────────────────
+
 export const router = createBrowserRouter([
+  // ── Standalone pages (no shell) ────────────────────────────────────────────
+  { path: '/portal', element: <PortalSelector /> },
+  { path: '/hr',     element: <HRDashboard /> },
+
+  // ── Intern app (full shell) ────────────────────────────────────────────────
   {
     element: <AppLayout />,
     children: [
       {
         element: <Shell />,
         children: [
-          { path: '/', element: <DashboardWrapper /> },
-          { path: '/tasks', element: <TasksPage /> },
+          { path: '/',         element: <RootGuard /> },
+          { path: '/tasks',    element: <TasksPage /> },
           { path: '/messages', element: <MessagesPage /> },
-          { path: '/knowledge', element: <KnowledgePage /> },
-          { path: '/badges', element: <BadgesPage /> },
-          { path: '/profile', element: <ProfilePage /> },
+          { path: '/knowledge',element: <KnowledgePage /> },
+          { path: '/badges',   element: <BadgesPage /> },
+          { path: '/profile',  element: <ProfilePage /> },
           { path: '/settings', element: <SettingsPage /> },
-          { path: '/results', element: <ResultsWrapper /> },
-          { path: '/hr', element: <HRDashboard /> },
+          { path: '/results',  element: <ResultsWrapper /> },
           {
             path: '/simulator',
             element: <SimShell />,
             children: [
               { index: true, element: <Navigate to="kyc" replace /> },
-              { path: 'kyc', element: <KycScenario /> },
-              { path: 'accounts', element: <ProtectedScenario id="accounts"><OpenAccountScenario /></ProtectedScenario> },
-              { path: 'deposits', element: <ProtectedScenario id="deposits"><DepositScenario /></ProtectedScenario> },
+              { path: 'kyc',       element: <KycScenario /> },
+              { path: 'accounts',  element: <ProtectedScenario id="accounts"><OpenAccountScenario /></ProtectedScenario> },
+              { path: 'deposits',  element: <ProtectedScenario id="deposits"><DepositScenario /></ProtectedScenario> },
               { path: 'transfers', element: <ProtectedScenario id="transfers"><TransferScenario /></ProtectedScenario> },
-              { path: 'cards', element: <ProtectedScenario id="cards"><CardIssueScenario /></ProtectedScenario> },
+              { path: 'cards',     element: <ProtectedScenario id="cards"><CardIssueScenario /></ProtectedScenario> },
               { path: 'sanctions', element: <SanctionsListPage /> },
-              { path: 'pep', element: <PepPage /> },
-              { path: 'aml', element: <AmlPage /> },
-              { path: 'handbook', element: <HandbookPage /> },
-              { path: 'activity', element: <ActivityPage /> },
+              { path: 'pep',       element: <PepPage /> },
+              { path: 'aml',       element: <AmlPage /> },
+              { path: 'handbook',  element: <HandbookPage /> },
+              { path: 'activity',  element: <ActivityPage /> },
             ],
           },
         ],
