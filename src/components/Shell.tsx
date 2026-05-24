@@ -14,6 +14,7 @@ const ROUTE_MAP: Record<string, string> = {
   knowledge:  '/knowledge',
   messages:   '/messages',
   badges:     '/badges',
+  hr:         '/hr',
   profile:    '/profile',
   settings:   '/settings',
 };
@@ -40,6 +41,7 @@ export function Sidebar() {
     { id: 'knowledge', label: 'База знаний', Icon: I.Book },
     { id: 'messages',  label: 'Сообщения',   Icon: I.Chat,   badge: '10' },
     { id: 'badges',    label: 'Награды',     Icon: I.Trophy },
+    { id: 'hr',        label: 'HR',          Icon: I.User },
   ];
   const personalItems = [
     { id: 'profile',  label: 'Профиль',   Icon: I.User },

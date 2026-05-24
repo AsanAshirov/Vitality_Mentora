@@ -12,6 +12,7 @@ import { KycScenario } from './screens/simulator/Simulator'
 import { OpenAccountScenario, DepositScenario, TransferScenario, CardIssueScenario } from './screens/simulator/Scenarios'
 import { AccountsPage, DepositsPage, TransfersPage, CardsPage, SanctionsListPage, PepPage, AmlPage, HandbookPage, ActivityPage } from './screens/simulator/SimPages'
 import { KnowledgePage, BadgesPage, ProfilePage, SettingsPage } from './screens/personal/PersonalScreens'
+import HRDashboard from './screens/HRDashboard'
 import WeekBriefModal from './components/modals/WeekBriefModal'
 import SearchModal from './components/modals/SearchModal'
 import { useUserStore } from './store/userStore'
@@ -126,6 +127,7 @@ export const router = createBrowserRouter([
           { path: '/profile', element: <ProfilePage /> },
           { path: '/settings', element: <SettingsPage /> },
           { path: '/results', element: <ResultsWrapper /> },
+          { path: '/hr', element: <HRDashboard /> },
           {
             path: '/simulator',
             element: <SimShell />,
